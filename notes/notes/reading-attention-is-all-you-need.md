@@ -8,6 +8,4 @@ discusses: '[[paper-attention-is-all-you-need]]'
 tagged: '[[tag-transformers]]'
 ---
 
-I read the paper [[paper-attention-is-all-you-need]].
-
-This is the foundational work that introduced the Transformer architecture, moving away from recurrence and convolutions entirely by relying on self-attention mechanisms.
+I read the paper Attention Is All You Need. It introduced the Transformer architecture, which uses self-attention mechanisms instead of traditional recurrent or convolutional layers. This is the basis for models like BERT and GPT. It's a core paper to understand for anyone in NLP.

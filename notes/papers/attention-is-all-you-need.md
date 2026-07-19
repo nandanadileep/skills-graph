@@ -2,7 +2,7 @@
 type: paper
 title: Attention Is All You Need
 slug: attention-is-all-you-need
-status: read
+status: abandoned
 created: '2026-07-19'
 updated: '2026-07-19'
 authors:
@@ -21,3 +21,7 @@ uses:
 ---
 
 Finished. The key insight is replacing recurrence with attention for parallelism. This is the core idea that made the [[transformer-architecture]] possible and is a direct application of [[self-attention]].
+
+---
+
+I dropped this paper. It felt too basic for where I am now.

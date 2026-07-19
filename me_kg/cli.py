@@ -1,5 +1,5 @@
 from __future__ import annotations
-import typer, json, pathlib, textwrap
+import os, typer, json, pathlib, textwrap
 from rich import print, console
 from typing import Optional
 from .config import Config
@@ -28,12 +28,19 @@ SCHEMA_HINT = textwrap.dedent("""\
 }""")
 
 def _run_extract(cfg: Config, system: str, content: str) -> pathlib.Path:
+    if "ZEN_API_KEY" not in os.environ:
+        raise SystemExit("ERROR: ZEN_API_KEY not set. Export it in your shell before starting opencode:\n  export ZEN_API_KEY=...")
     idx = load_index(cfg)
     ctx = context_lines(idx)
     system_full = PROMPT_BASE + "\n\nEXISTING VAULT NODES (reuse slugs where they fit):\n" + ctx + "\n\nSCHEMA:\n" + SCHEMA_HINT + "\n\n" + system
-    agent = Agent(cfg)
-    payload = agent.extract(system_full, content)
-    result = validate(payload)
+    try:
+        agent = Agent(cfg)
+        payload = agent.extract(system_full, content)
+        result = validate(payload)
+    except SystemExit:
+        raise
+    except Exception as e:
+        raise SystemExit(f"ERROR: agent extraction failed: {e}")
     path = write_node(cfg, result)
     build_index(cfg)
     git_commit(cfg, [path], f"me-kg: ingest {result.node.type.value} '{result.node.slug}'")

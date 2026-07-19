@@ -293,6 +293,15 @@ def orphans(threshold: int = 1, json_out: bool = False):
         print(f"           {o['title']}")
 
 @app.command()
+def communities(resolution: float = 1.2, force: bool = False,
+                dry_run: bool = False):
+    """Detect Louvain communities and write a `notes/clusters/<slug>.md` file
+    per community, with member links + LLM-proposed name/summary."""
+    cfg = Config.load()
+    from . import communities as cm
+    cm.run(cfg, resolution=resolution, force=force, dry_run=dry_run)
+
+@app.command()
 def watch(folder: str, interval: int = 10):
     """Watch a folder for new PDFs and git repos to ingest. (Phase 2 stub.)"""
     print(f"[yellow]watch[/] not yet implemented (planned). For now run `me-kg paper <pdf>` / `me-kg project <repo>` explicitly.")

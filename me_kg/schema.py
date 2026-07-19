@@ -38,6 +38,7 @@ class EdgeType(str, Enum):
     tagged = "tagged"
     depends_on = "depends_on"
     built_with = "built_with"
+    member_of = "member_of"
 
 class Edge(BaseModel):
     type: EdgeType

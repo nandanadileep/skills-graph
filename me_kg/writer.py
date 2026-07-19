@@ -4,6 +4,7 @@ from typing import Iterable
 from .schema import IngestResult, EdgeType, NodeType, Status
 
 FRONTMATTER_FENCE = "---\n"
+FRONTMATTER_FENCE_END = "---\n"
 _SLUG_RE = re.compile(r"^\[\[([^\]]+)\]\]$")
 
 def _slugify(s: str) -> str:

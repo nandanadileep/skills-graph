@@ -1,0 +1,5 @@
+[me-kg]
+# primary_model = "big-pickle"
+# fallback_model = "deepseek-v4-flash-free"
+# auto_commit = true
+# private_mode = false

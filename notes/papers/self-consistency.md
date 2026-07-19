@@ -9,4 +9,4 @@ created: '2026-07-19'
 updated: '2026-07-19'
 ---
 
-Reading the 'Self-Consistency' paper. It builds on chain-of-thought prompting and uses tool-use to enhance reasoning consistency.
+Reading Self-Consistency, which extends chain-of-thought and uses tool-use.

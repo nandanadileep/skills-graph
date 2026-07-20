@@ -187,7 +187,7 @@ def paper(path: str, ocr: bool = True):
     payload = f"PDF METADATA:\n{json.dumps(meta, indent=2)}\n\nPDF CONTENT (truncated):\n{text[:16000]}"
     _run_extract(cfg, PAPER_SYS, payload)
 
-PROJECT_SYS = "SOURCE TYPE: project (your own git repo). Treat it as the user's own project. Extract name, primary languages, status (active/dormant/archived based on recent commits), the libraries/frameworks it 'built_with' (only the top 3, not all deps), and 2-4 core concepts to spawn (don't over-spawn). Add 'implements' edges to papers/concepts if the README mentions any. Keep summary under 100 words. Be concise — do not enumerate every dependency or list every commit. The note body should reflect the user's voice about WHY this exists and what's interesting, not a sales pitch."
+PROJECT_SYS = "SOURCE TYPE: project (the user's own repo or folder). Treat it as the user's own project. Extract name, primary languages, status (active/dormant/archived based on recent commits if git, else 'active' if README/code is fresh else 'dormant'), the libraries/frameworks it 'built_with' (only the top 3, not all deps), and 2-4 core concepts to spawn (don't over-spawn). Add 'implements' edges to papers/concepts if the README mentions any. Keep summary under 100 words. Be concise — do not enumerate every dependency or list every commit. The note body should reflect the user's voice about WHY this exists and what's interesting, not a sales pitch. If there are no commits or git info, infer status from README freshness and file list — don't refuse to make a node."
 
 @app.command()
 def project(path: str, max_log: int = 50):

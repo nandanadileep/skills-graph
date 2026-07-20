@@ -3,32 +3,42 @@ import subprocess, pathlib, re
 
 def extract_repo(path: str, *, max_log: int = 50) -> tuple[str, dict]:
     p = pathlib.Path(path).expanduser().resolve()
-    if not (p / ".git").exists():
-        raise SystemExit(f"{p} is not a git repo")
+    if not p.is_dir():
+        raise SystemExit(f"{p} is not a directory")
+    is_git = (p / ".git").exists()
     readme = ""
     for name in ("README.md", "README.mdx", "README.txt", "README"):
         f = p / name
         if f.exists():
             readme = f.read_text(errors="ignore")[:8000]
             break
-    log = subprocess.run(
-        ["git", "-C", str(p), "log", f"-n{max_log}",
-         "--format=%h %ad %s  @%an", "--date=short"],
-        capture_output=True, text=True,
-    ).stdout
+    log = ""
+    dirty = False
+    if is_git:
+        log = subprocess.run(
+            ["git", "-C", str(p), "log", f"-n{max_log}",
+             "--format=%h %ad %s  @%an", "--date=short"],
+            capture_output=True, text=True,
+        ).stdout
+        status = subprocess.run(
+            ["git", "-C", str(p), "status", "--porcelain"],
+            capture_output=True, text=True,
+        ).stdout.strip()
+        dirty = bool(status)
     pkg = _guess_pkg(p)
     langs = _guess_langs(p)
-    status = subprocess.run(
-        ["git", "-C", str(p), "status", "--porcelain"],
-        capture_output=True, text=True,
-    ).stdout.strip()
-    blob = f"# Repo: {p.name}\n\n## README\n{readme}\n\n## Recent commits\n{log}\n\n## Languages\n{', '.join(langs)}\n"
+    sections = [f"# Project: {p.name}", f"\n## README\n{readme}"]
+    if log:
+        sections.append(f"\n## Recent commits\n{log}")
+    sections.append(f"\n## Languages\n{', '.join(langs)}")
+    blob = "\n".join(sections) + "\n"
     return blob, {
         "name": p.name,
         "path": str(p),
         "package": pkg,
         "languages": langs,
-        "dirty": bool(status),
+        "dirty": dirty,
+        "is_git": is_git,
     }
 
 _HEURISTICS = {

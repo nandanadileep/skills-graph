@@ -8,6 +8,12 @@ extracting nodes and typed edges from raw content. Deterministic code does the
 boring reliable part — parsing PDFs, git logs, validating schema, writing
 files, committing.
 
+### Prerequisites
+
+- **python3** (3.11+)
+- **Obsidian** (optional — for browsing the graph visually. The vault is plain markdown, readable anywhere.)
+- A Zen API key from [opencode.ai/auth](https://opencode.ai/auth)
+
 ## Setup
 
 ```bash

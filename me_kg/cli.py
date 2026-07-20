@@ -163,10 +163,12 @@ def _strip_brackets(s: str) -> str:
 def _write_and_commit(cfg: Config, result: IngestResult, source_tag: str = "") -> pathlib.Path:
     path = write_node(cfg, result, matched_slug=result.node.slug if result.action == "update" else None)
     build_index(cfg)
-    git_commit(cfg, [path], f"me-kg: {result.action} {result.node.type.value} '{result.node.slug}'{source_tag}")
+    if cfg.auto_commit:
+        git_commit(cfg, [path], f"me-kg: {result.action} {result.node.type.value} '{result.node.slug}'{source_tag}")
     print(f"[bold green]{result.action}[/] {path}")
     status_str = f"  status: {result.node.status.value}" if result.node.status else ""
     print(f"  edges: {len(result.edges)}  spawned: {len(result.spawn)}{status_str}")
+    print(f"[dim]obsidian has it now. run `me-kg sync` to back up to git.[/]")
     return path
 
 def _run_extract(cfg: Config, system: str, content: str) -> pathlib.Path:
@@ -185,7 +187,7 @@ def paper(path: str, ocr: bool = True):
     payload = f"PDF METADATA:\n{json.dumps(meta, indent=2)}\n\nPDF CONTENT (truncated):\n{text[:16000]}"
     _run_extract(cfg, PAPER_SYS, payload)
 
-PROJECT_SYS = "SOURCE TYPE: project (your own git repo). Treat it as the user's own project. Extract name, primary languages, status (active/dormant/archived based on recent commits), the libraries/frameworks it 'built_with', dependencies as 'depends_on'. Spawn concepts for the core technical ideas. Add 'implements' edges to papers/concepts if the README mentions any. The note body should reflect the user's voice about WHY this exists and what's interesting, not a sales pitch."
+PROJECT_SYS = "SOURCE TYPE: project (your own git repo). Treat it as the user's own project. Extract name, primary languages, status (active/dormant/archived based on recent commits), the libraries/frameworks it 'built_with' (only the top 3, not all deps), and 2-4 core concepts to spawn (don't over-spawn). Add 'implements' edges to papers/concepts if the README mentions any. Keep summary under 100 words. Be concise — do not enumerate every dependency or list every commit. The note body should reflect the user's voice about WHY this exists and what's interesting, not a sales pitch."
 
 @app.command()
 def project(path: str, max_log: int = 50):
@@ -291,6 +293,13 @@ def orphans(threshold: int = 1, json_out: bool = False):
         status_str = f"  [dim]{o['status']}[/]" if o.get("status") else ""
         print(f"  {o['type'] or '?':8s}  deg={o['degree']}  [[{o['slug']}]]{status_str}")
         print(f"           {o['title']}")
+
+@app.command()
+def sync():
+    """Disabled. Git backup is off — vault is local-only."""
+    from rich import print as rprint
+    rprint("[yellow]sync disabled[/]: auto_commit is off and git backup is not used. "
+           "Your vault is local-only at notes/. Use a manual git commit if you ever want a backup.")
 
 @app.command()
 def communities(resolution: float = 1.2, force: bool = False,

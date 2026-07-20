@@ -39,7 +39,7 @@ class Agent:
         }
         if json_mode:
             body["response_format"] = {"type": "json_object"}
-        with httpx.Client(timeout=120) as c:
+        with httpx.Client(timeout=httpx.Timeout(300.0, connect=10.0)) as c:
             r = c.post(self.cfg.zen_endpoint, headers=headers, json=body)
             r.raise_for_status()
             data = r.json()
@@ -49,10 +49,17 @@ class Agent:
             raise RuntimeError(f"unexpected zen response: {data}") from e
 
     def extract(self, system: str, user: str) -> dict:
+        from rich import print as rprint
+        import time
+        last = None
         for model in (self.cfg.primary_model, self.cfg.fallback_model):
+            t0 = time.time()
+            rprint(f"[dim]agent: calling {model}...[/]")
             try:
                 raw = self.complete(system, user, json_mode=True, model=model)
+                rprint(f"[dim]agent: {model} returned in {time.time()-t0:.0f}s[/]")
                 return _extract_json(raw)
             except Exception as e:
+                rprint(f"[dim]agent: {model} failed: {e!r}[/]")
                 last = e
         raise RuntimeError(f"agent extraction failed: {last}")

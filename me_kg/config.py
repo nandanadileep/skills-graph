@@ -12,7 +12,7 @@ class Config:
     zen_endpoint: str = "https://opencode.ai/zen/v1/chat/completions"
     primary_model: str = "big-pickle"
     fallback_model: str = "deepseek-v4-flash-free"
-    auto_commit: bool = True
+    auto_commit: bool = False
     private_mode: bool = False
 
     @classmethod

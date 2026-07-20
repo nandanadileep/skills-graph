@@ -35,7 +35,25 @@ Done. Now open opencode anywhere and just talk — "I'm reading this paper...", 
 
 ## Usage
 
-### Ingest content
+### Via opencode (after skill is installed)
+
+Just talk to opencode — the skill routes to the right command:
+
+| You say in opencode | What happens |
+|---|---|
+| "I'm reading this paper ~/Downloads/react.pdf" | `me-kg paper ~/Downloads/react.pdf` |
+| "Reading https://arxiv.org/abs/..." | `me-kg url https://arxiv.org/abs/...` |
+| "I had an idea: X should do Y" | `me-kg note "I had an idea: X should do Y"` |
+| "update the graph" (in a repo) | `me-kg project .` |
+| "what's in my graph lately?" | `me-kg graph` |
+
+Triggers: "I read", "I'm reading", "I just learned", "this paper", "update graph",
+"add to graph", "/updategraph", "/note", "/read".
+
+The agent creates the note, spawns concepts, wires edges — then tells you what it
+did. Open Obsidian (point it at `~/me-kg/notes`) to browse the graph.
+
+### Direct CLI
 
 | Command | Description |
 |---|---|

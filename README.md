@@ -11,29 +11,27 @@ files, committing.
 ## Setup
 
 ```bash
-git clone https://github.com/nandanadileep/skills-graph.git me-kg
-cd me-kg
+# 1. Clone
+git clone https://github.com/nandanadileep/skills-graph.git ~/me-kg
+cd ~/me-kg
+
+# 2. Install
 python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
-```
 
-Then set your Zen API key (get one at https://opencode.ai/auth):
-
-**Option A — env var:**
-```bash
-export ZEN_API_KEY=sk-...
-```
-
-**Option B — config file (persistent, recommended):**
-```bash
+# 3. Set your Zen API key (get one at https://opencode.ai/auth)
 cp me-kg.toml.example me-kg.toml
-# Edit me-kg.toml and uncomment + set zen_api_key
+# Edit me-kg.toml → uncomment and set: zen_api_key = "sk-..."
+
+# 4. Install the opencode skill (one-time, works across all projects)
+mkdir -p ~/.config/opencode/skills
+ln -s ~/me-kg/skills/updategraph ~/.config/opencode/skills/updategraph
+
+# 5. Open the vault in Obsidian
+# Point Obsidian at ~/me-kg/notes as a vault
 ```
 
-Test:
-```bash
-me-kg note "hello, graph"
-```
+Done. Now open opencode anywhere and just talk — "I'm reading this paper...", "update this graph", etc.
 
 ## Usage
 

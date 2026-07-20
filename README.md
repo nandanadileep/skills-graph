@@ -22,11 +22,29 @@ files, committing.
 ## Setup
 
 ```bash
+git clone https://github.com/nandanadileep/skills-graph.git me-kg
 cd me-kg
-python -m venv .venv && source .venv/bin/activate
+python3 -m venv .venv && source .venv/bin/activate
 pip install -e .
-export ZEN_API_KEY=...           # from https://opencode.ai/auth
-me-kg paper ~/Downloads/whatever.pdf
+```
+
+Then configure your Zen API key (get one at https://opencode.ai/auth).
+Pick one method:
+
+**Option A — env var:**
+```bash
+export ZEN_API_KEY=sk-...
+```
+
+**Option B — config file (persistent, recommended):**
+```bash
+cp me-kg.toml.example me-kg.toml
+# Edit me-kg.toml and uncomment + set zen_api_key
+```
+
+Test it:
+```bash
+me-kg note "hello, graph"
 ```
 
 ## Schema

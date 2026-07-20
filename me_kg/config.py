@@ -10,6 +10,7 @@ class Config:
     vault_dir: pathlib.Path = DEFAULT_VAULT
     state_dir: pathlib.Path = DEFAULT_STATE_DIR
     zen_endpoint: str = "https://opencode.ai/zen/v1/chat/completions"
+    zen_api_key: str = ""
     primary_model: str = "big-pickle"
     fallback_model: str = "deepseek-v4-flash-free"
     auto_commit: bool = False
@@ -26,7 +27,7 @@ class Config:
                     setattr(cfg, k, pathlib.Path(v).expanduser())
                 else:
                     setattr(cfg, k, v)
-        if not os.environ.get("ZEN_API_KEY"):
+        if not os.environ.get("ZEN_API_KEY") and not cfg.zen_api_key:
             import warnings
             warnings.warn("ZEN_API_KEY not set — agent commands will fail; rebuild/graph still work.")
         cfg.vault_dir.mkdir(parents=True, exist_ok=True)

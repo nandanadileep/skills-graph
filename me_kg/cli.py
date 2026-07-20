@@ -97,8 +97,8 @@ def _detect_status(text: str) -> str | None:
     return max(found, key=lambda s: order[s])
 
 def _safe_extract(cfg: Config, system: str, content: str) -> IngestResult:
-    if "ZEN_API_KEY" not in os.environ:
-        raise SystemExit("ERROR: ZEN_API_KEY not set. Export it in your shell before starting opencode:\n  export ZEN_API_KEY=...")
+    if "ZEN_API_KEY" not in os.environ and not cfg.zen_api_key:
+        raise SystemExit("ERROR: ZEN_API_KEY not set. Export it in your shell:\n  export ZEN_API_KEY=...\nOr set zen_api_key in me-kg.toml")
     idx = load_index(cfg)
     ctx = context_lines(idx)
     system_full = (PROMPT_BASE + "\n\n" + STUB_RULES + "\n\n" + UPSERT_RULES
@@ -175,6 +175,8 @@ def _run_extract(cfg: Config, system: str, content: str) -> pathlib.Path:
     result = _safe_extract(cfg, system, content)
     return _write_and_commit(cfg, result)
 
+ARTICLE_SYS = "SOURCE TYPE: article/blog post (web). Extract title, author, date if visible. Pull out the 3-7 core concepts as separate concept spawns — be thorough, these are the key ideas the piece teaches. Connect to existing concepts/projects/papers with relates_to_concept, discusses, extends, idea_from, uses edges wherever they fit. If the article cites known frameworks or papers, add 'cites' edges. Add 'mentions_person' for named authors/creators. Add 'tagged' edges for domain tags (e.g. RAG, agents, engineering). The body should be a concise first-person synthesis of the main takeaways. status = 'reading'."
+
 PAPER_SYS = "SOURCE TYPE: paper (PDF). Extract title, authors, year, venue if visible. Pull out the 3-7 core concepts as separate concept spawns. Connect to existing concepts/projects where they fit (relates_to_concept, cites existing papers). If it builds on something you already know, add an 'extends' edge. status = 'reading' if the user is reading it now, 'read' if they finished."
 
 @app.command()
@@ -187,7 +189,7 @@ def paper(path: str, ocr: bool = True):
     payload = f"PDF METADATA:\n{json.dumps(meta, indent=2)}\n\nPDF CONTENT (truncated):\n{text[:16000]}"
     _run_extract(cfg, PAPER_SYS, payload)
 
-PROJECT_SYS = "SOURCE TYPE: project (the user's own repo or folder). Treat it as the user's own project. Extract name, primary languages, status (active/dormant/archived based on recent commits if git, else 'active' if README/code is fresh else 'dormant'), the libraries/frameworks it 'built_with' (only the top 3, not all deps), and 2-4 core concepts to spawn (don't over-spawn). Add 'implements' edges to papers/concepts if the README mentions any. Keep summary under 100 words. Be concise — do not enumerate every dependency or list every commit. The note body should reflect the user's voice about WHY this exists and what's interesting, not a sales pitch. If there are no commits or git info, infer status from README freshness and file list — don't refuse to make a node."
+PROJECT_SYS = "SOURCE TYPE: project (the user's own repo or folder). Treat it as the user's own project. Extract name, primary languages, the libraries/frameworks it 'built_with' (only the top 3, not all deps), and 2-4 core concepts to spawn (don't over-spawn). Add 'implements' edges to papers/concepts if the README mentions any. Keep summary under 100 words. Be concise — do not enumerate every dependency or list every commit. The note body should reflect the user's voice about WHY this exists and what's interesting, not a sales pitch. Omit status — it is not used for project nodes."
 
 @app.command()
 def project(path: str, max_log: int = 50):
@@ -227,8 +229,9 @@ def url(link: str):
     html = httpx.get(link, follow_redirects=True, timeout=30).text
     body = re.sub(r"<script.*?</script>", "", html, flags=re.S)
     body = re.sub(r"<[^>]+>", " ", body)
-    payload = f"URL: {link}\n\n{body[:16000]}"
-    _run_extract(cfg, NOTE_SYS + "\nIf this is clearly an article/blog post emit 'article' node (or 'paper' if it's a paper).", payload)
+    body = re.sub(r"\s{3,}", "\n\n", body)
+    payload = f"URL: {link}\n\n{body[:32000]}"
+    _run_extract(cfg, ARTICLE_SYS, payload)
 
 @app.command()
 def rebuild():

@@ -7,3 +7,6 @@ __pycache__/
 
 # vault is local-only — never push to git
 notes/
+
+# config can hold secrets
+me-kg.toml

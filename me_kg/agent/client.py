@@ -25,9 +25,9 @@ def _extract_json(text: str) -> dict[str, Any]:
 class Agent:
     def __init__(self, cfg: Config):
         self.cfg = cfg
-        if "ZEN_API_KEY" not in os.environ:
-            raise RuntimeError("ZEN_API_KEY not set")
-        self.key = os.environ["ZEN_API_KEY"]
+        self.key = os.environ.get("ZEN_API_KEY") or cfg.zen_api_key
+        if not self.key:
+            raise RuntimeError("ZEN_API_KEY not set — export ZEN_API_KEY or set zen_api_key in me-kg.toml")
 
     def complete(self, system: str, user: str, *, json_mode: bool = True, model: str | None = None) -> str:
         model = model or self.cfg.primary_model
